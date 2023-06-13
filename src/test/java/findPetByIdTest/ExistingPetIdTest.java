@@ -1,13 +1,15 @@
 package findPetByIdTest;
 
+import dto.pet.Pet;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 
-public class FindPetByIdTests {
+public class ExistingPetIdTest {
 
   private static final String BASE_URL = "https://petstore.swagger.io/";
 
@@ -17,52 +19,24 @@ public class FindPetByIdTests {
   }
 
   @Test
-  public void testFindPetById_ExistingPetId() {
+  public void ExistingPet() {
     // Тесткейс: Проверяем поиск существующего питомца по его идентификатору
     // Ожидаемый результат: Код ответа 200 и питомец с указанным идентификатором
 
     long petId = 12345;
 
-    given()
+    Response response = given()
             .pathParam("petId", petId)
             .when()
             .get("/pet/{petId}")
             .then()
             .statusCode(200)
-            .body("id", equalTo(petId))
-            .body("name", equalTo("Max"))
-            .body("status", equalTo("available"));
-  }
+            .extract().response();
 
-  @Test
-  public void testFindPetById_NonexistentPetId() {
-    // Тесткейс: Проверяем поиск несуществующего питомца по его идентификатору
-    // Ожидаемый результат: Код ответа 404 и сообщение об ошибке
+    Pet petResponse = response.as(Pet.class);
 
-    long petId = 99999;
-
-    given()
-            .pathParam("petId", petId)
-            .when()
-            .get("/pet/{petId}")
-            .then()
-            .statusCode(404)
-            .body("message", equalTo("Pet not found"));
-  }
-
-  @Test
-  public void testFindPetById_InvalidPetId() {
-    // Тесткейс: Проверяем поиск питомца с неправильным форматом идентификатора
-    // Ожидаемый результат: Код ответа 400 и сообщение об ошибке
-
-    String petId = "invalid_id";
-
-    given()
-            .pathParam("petId", petId)
-            .when()
-            .get("/pet/{petId}")
-            .then()
-            .statusCode(400)
-            .body("message", equalTo("Invalid pet ID format"));
+    Assertions.assertEquals(petId, petResponse.getId(), "Incorrect pet ID");
+    Assertions.assertEquals("Max", petResponse.getName(), "Incorrect pet name");
+    Assertions.assertEquals("available", petResponse.getStatus(), "Incorrect pet status");
   }
 }

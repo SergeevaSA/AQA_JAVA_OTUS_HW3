@@ -1,21 +1,20 @@
 package services;
-
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
 
-public class UserApi {
-  private static final String BASE_URI = "https://petstore.swagger.io/v2/";
+public class PetApi {
+  private static final String BASE_URI = "https://petstore.swagger.io/v2";
   private RequestSpecification spec;
-  private static final String USER = "/user";
+  private static final String PET = "/pet";
 
   public void exampleTest() {
     given()
-            .baseUri("https://petstore.swagger.io/v2")  //https://petstore.swagger.io/v2{userName}
+            .baseUri(BASE_URI)
             .header("Content-Type", "application/json")
-            .basePath("user")
-            .param("userName", "testUser")
+            .basePath(PET)
+            .param("petId", "12345")
             .log().all()
             .body("")
             .when()
@@ -24,7 +23,7 @@ public class UserApi {
             .log().all();
   }
 
-  public UserApi() {
+  public PetApi() {
     spec = given()
             .baseUri(BASE_URI)
             .contentType(ContentType.JSON);
